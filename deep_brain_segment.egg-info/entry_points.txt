@@ -1,0 +1,5 @@
+[console_scripts]
+dbsegment = deep_brain_segment.deep_brain_segment:main
+dbsegment_infer = deep_brain_segment.deep_brain_segment:main_infer
+dbsegment_prep = deep_brain_segment.deep_brain_segment:main_preprocess
+
