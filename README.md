@@ -1,7 +1,9 @@
 # Deep Brain Segment <h1>
+This tool generates segmentations of 30 deep brain structures, plus an additional label for the remaining brain areas ("brain mask") from T1-Weighted MRI. 
+For a defintion of the resulting labels refer to the paper or the provided ITK labels file `labels.txt`.
 
 ## Comand line tool
-  This tool generates 30 deep brain structures segmentation, as well as a brain mask from T1-Weighted MRI. 
+
  The tool is available as a pip package.
   
   `pip install deep-brain-segment`
