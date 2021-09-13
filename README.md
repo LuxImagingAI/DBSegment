@@ -33,7 +33,10 @@ optional: **-mp** path to the trained model. The default is /usr/local/share
 optional: **-f** folds (networks) used for segmentation inferrence. The available folds are *0, 1, 2, 3, 4, 5, 6*. The default folds are *4* and *6*. We recommend to keep the default settings, and do not define this parameter. Using more folds will increase the needed computation time.
 
   `-f 4 6`
-  
+ 
+## Model  
+We provide the trained neural network model for download. The command line tool will automatically download the model files if not present at the first run.
+ 
 ## How to cite 
   You can find much more information, in particular on robustness across acuqisition domains in the following paper. Please cite this publication when using the tool in own works:
   
