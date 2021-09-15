@@ -1,0 +1,11 @@
+LICENSE
+pyproject.toml
+setup.py
+DBSegment/DBSegment.py
+DBSegment/__init__.py
+DBSegment.egg-info/PKG-INFO
+DBSegment.egg-info/SOURCES.txt
+DBSegment.egg-info/dependency_links.txt
+DBSegment.egg-info/entry_points.txt
+DBSegment.egg-info/requires.txt
+DBSegment.egg-info/top_level.txt

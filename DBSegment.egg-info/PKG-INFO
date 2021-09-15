@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
-Name: deep-brain-segment
-Version: 0.0.4
+Name: DBSegment
+Version: 0.0.3
 Summary: A deep learnign based method to segment deep brain structures from T1w MRI
 Home-page: UNKNOWN
 Author: Mehri
@@ -14,7 +14,6 @@ Classifier: Programming Language :: Python :: 3
 Classifier: Operating System :: Unix
 Classifier: Operating System :: MacOS :: MacOS X
 Classifier: Operating System :: Microsoft :: Windows
-Description-Content-Type: text/markdown
 License-File: LICENSE
 
 UNKNOWN

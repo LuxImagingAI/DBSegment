@@ -10,24 +10,41 @@ import requests
 import zipfile
 import argparse
 import torch
+import SimpleITK as sitk
 
 
 def arguments():
     parser = argparse.ArgumentParser()
+    
+    parser.add_argument('-i', '--input_folder', help="Path to the folder containing the input T1w MRIs", required=True)
+    
+    parser.add_argument('-o', '--output_folder', required=True, help="This is the path where you would like to save the model predictions")
+
     parser.add_argument('-mp', '--model_path', required=False, default='/usr/local/share/',
                                             help="This is the path where you would like to save the model. Default is the /usr/local/share"
                                             "automatically")
+                                            
+    parser.add_argument('-v', '--version_of_preprocessing', required=False , default='v3',
+                                                                help="You can set this to v1, to change only the orientation of the input image during the preprocessing."
+                                                               "It conforms the input image to LPI (itksnap) orientation."
+                                                               "This might reduce the quality of the segmentation by 1-2%."
+                                                                "The default is v3, it confomrs the input image to orientation LPI (itksnap), 1mm voxel spacing, and 256 dimension.")
+                                            
     parser.add_argument('-f', '--folds', nargs='+', default='None',
-                                            help="folds to use for prediction. Default is Fold 4 adn 6"
-                                            "automatically in the model output folder")
-    parser.add_argument('-i', '--input_folder', help="Must contain all modalities for each patient in the correct"
-                        " order (same as training). Files must be named "
-                        "CASENAME_XXXX.nii.gz where XXXX is the modality "
-                        "identifier (0000, 0001, etc)", required=True)
-    parser.add_argument('-o', '--output_folder', required=True, help="folder for saving predictions")
+                                            help="folds to use for prediction. Default is Fold 4 adn 6."
+                                            "You can choose any fold between 0 to 6")
+
+    parser.add_argument('--disable_tta', type=str, required=False, default='None',
+                            help="set this flag to False to disable test time data augmentation via mirroring. Speeds up inference "
+                            "Default is True")
+
+    parser.add_argument('--overwrite_existing', required=False, default=False, action="store_true",
+                    help="Set this flag if the target folder contains predictions that you would like to overwrite"
+                        "Default is False")
     
     parser.add_argument('--all_in_gpu', type=str, default='None', required=False, help='can be None, False or True. '
-                        "Do not touch.")
+                        "Do not touch, unless you have applied changes in nnunet for running the network on CPU only."
+                         "In this case set this flasg to False")
                         
     parser.add_argument("--num_threads_nifti_save", required=False, default=2, type=int, help=
                                             "Determines many background processes will be used for segmentation export. Reduce this if you "
@@ -62,11 +79,10 @@ def arguments():
                                             "--num_parts=n (each with a different "
                                             "GPU (via "
                                             "CUDA_VISIBLE_DEVICES=X)")
+
     parser.add_argument("--num_threads_preprocessing", required=False, default=6, type=int, help=
                                             "Determines many background processes will be used for data preprocessing. Reduce this if you "
                                             "run into out of memory (RAM) problems. Default: 6")
-    
-    #parser.add_argument('-p', '--plans_identifier', help='do not touch this unless you know what you are doing',default=default_plans_identifier, required=False)
 
     return parser
 
@@ -129,7 +145,7 @@ def correct_num_col(input, output):
         new_mr.set_data_dtype(img1.get_data_dtype())
         nib.save(new_mr, output)
 
-def lpi_conform(input, output):
+def conform_v3(input, output):
     img = nib.load(input)
     h1 = MGHHeader.from_header(img)
     
@@ -147,6 +163,46 @@ def lpi_conform(input, output):
     
     new_img.set_data_dtype(img.get_data_dtype())
     nib.save(new_img, output)
+
+
+def conform_v1(input, output):
+    
+    img = nib.load(input)
+    h1 = MGHHeader.from_header(img)
+    x1, y1, z1=img.shape[:3]
+    h1.set_data_shape([x1, y1, z1])
+    
+    sx, sy, sz=img.header.get_zooms()
+    h1.set_zooms([sx, sy, sz])
+    h1['Mdc'] = [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
+    h1['Pxyz_c'] = img.affine.dot(np.hstack((np.array(img.shape[:3]) / 2.0, [1])))[:3]
+    
+    ras2ras=np.array([[1.0, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]])
+    vox2vox=inv(h1.get_affine())@ ras2ras @ img.affine
+    
+    new_data = affine_transform(img.get_fdata(), inv(vox2vox), output_shape=h1.get_data_shape(), order=1)
+    new_img = nib.MGHImage(new_data, h1.get_affine(), h1)
+    
+    new_img.set_data_dtype(img.get_data_dtype())
+    nib.save(new_img, output)
+
+def brainmask_extraction(input, output1, output2):
+    img1 = sitk.ReadImage(input)
+    brainmask = sitk.BinaryThreshold( img1, 1, 31, 1, 0 )
+    sitk.WriteImage(brainmask, output1)
+  
+    img2 = nib.load(input)
+    data = img2.get_fdata()
+    data[data==1]=0
+    h1 = MGHHeader.from_header(img2)
+    h1.set_data_shape([256, 256, 256])
+    h1.set_zooms([1, 1, 1])
+    h1['Mdc'] = [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
+    h1['Pxyz_c'] = img2.affine.dot(np.hstack((np.array(img2.shape[:3]) / 2.0, [1])))[:3]
+    labels = nib.MGHImage(data, h1.get_affine(), h1)
+    labels.set_data_dtype(img2.get_data_dtype())
+    nib.save(labels, output2)
+
 
 def download_model(parser):
     args = parser.parse_args()
@@ -168,7 +224,11 @@ def download_model(parser):
 def inference(parser):
     blockPrint()
     args = parser.parse_args()
-    directory = 'preprocessed'
+    version_of_preprocessing = args.version_of_preprocessing
+    if version_of_preprocessing=='v3':
+       directory = 'preprocessed_v3'
+    elif version_of_preprocessing=='v1':
+       directory = 'preprocessed_v1'
     path = os.path.join(args.input_folder, directory)
     input_folder = path
     output_folder = args.output_folder
@@ -179,9 +239,9 @@ def inference(parser):
     lowres_segmentations = 'None'
     num_threads_preprocessing = args.num_threads_preprocessing
     num_threads_nifti_save = args.num_threads_nifti_save
-    disable_tta = False
+    disable_tta = args.disable_tta
     step_size = 0.5
-    overwrite_existing = False
+    overwrite_existing = args.overwrite_existing
     mode = "normal"
     all_in_gpu = args.all_in_gpu
     model = '3d_fullres'
@@ -221,6 +281,14 @@ def inference(parser):
     elif all_in_gpu == "False":
         all_in_gpu = False
 
+    assert disable_tta in ['None', 'False', 'True']
+    if disable_tta == "None":
+         disable_tta = True
+    elif disable_tta == "True":
+         disable_tta = True
+    elif disable_tta == "False":
+         disable_tta = False
+
 
     trainer = trainer_class_name
         
@@ -239,32 +307,64 @@ def preprocessing(parser):
     args = parser.parse_args()
     input = args.input_folder
     input_folder = input
+    overwrite_existing = args.overwrite_existing
+    version_of_preprocessing = args.version_of_preprocessing
     os.chdir(input)
-    directory = 'preprocessed'
+    if version_of_preprocessing=='v3':
+        directory = 'preprocessed_v3'
+    elif version_of_preprocessing=='v1':
+        directory = 'preprocessed_v1'
     path = os.path.join(input_folder, directory)
     if not os.path.exists(path):
         os.mkdir(path)
-    for file in glob.glob('*.nii.gz'):
-        input_img = os.path.join(input_folder, file)
-        filename, file_extension = os.path.splitext(file)
+    for file in glob.glob(os.path.join(input_folder,'*.nii.gz')):
+        file_path , file_name = os.path.split(file)
+        input_img = os.path.join(input_folder, file_name)
+        filename, file_extension = os.path.splitext(file_name)
         filename1, file_extension1 = os.path.splitext(filename)
         output_img = os.path.join(path, filename1 + '_0000'+ file_extension1 + file_extension)
-        if not os.path.isfile(output_img):
-           print('Pre-processing: ', file)
-           correct_header(input_img, output_img)
-           correct_num_col(output_img, output_img)
-           lpi_conform(output_img, output_img)
+        if not overwrite_existing:
+           if not os.path.isfile(output_img):
+               print('Pre-processing: ', file_name)
+               correct_header(input_img, output_img)
+               correct_num_col(output_img, output_img)
+               if version_of_preprocessing=='v3':
+                  conform_v3(output_img, output_img)
+               elif version_of_preprocessing=='v1':
+                  conform_v1(output_img, output_img)
+        elif overwrite_existing:
+               print('Pre-processing: ', file_name)
+               correct_header(input_img, output_img)
+               correct_num_col(output_img, output_img)
+               if version_of_preprocessing=='v3':
+                  conform_v3(output_img, output_img)
+               elif version_of_preprocessing=='v1':
+                  conform_v1(output_img, output_img)
+
         #else:
         #   print(file, ' is already preprocessed.')
-    for file in glob.glob('*.nii'):
-        input_img = os.path.join(input_folder, file)
-        filename, file_extension = os.path.splitext(file)
+    for file in glob.glob(os.path.join(input_folder,'*.nii')):
+        file_path , file_name = os.path.split(file)
+        input_img = os.path.join(input_folder, file_name)
+        filename, file_extension = os.path.splitext(file_name)
         output_img = os.path.join(path, filename + '_0000'+ file_extension + '.gz')
-        if not os.path.isfile(output_img):        
-          print('Pre-processing: ', file)
-          correct_header(input_img, output_img)
-          correct_num_col(output_img, output_img)
-          lpi_conform(output_img, output_img)
+        if not overwrite_existing:        
+             if not os.path.isfile(output_img):        
+                print('Pre-processing: ', file_name)
+                correct_header(input_img, output_img)
+                correct_num_col(output_img, output_img)
+                if version_of_preprocessing=='v3':
+                   conform_v3(output_img, output_img)
+                elif version_of_preprocessing=='v1':
+                   conform_v1(output_img, output_img)
+        elif overwrite_existing:
+             print('Pre-processing: ', file_name)
+             correct_header(input_img, output_img)
+             correct_num_col(output_img, output_img)
+             if version_of_preprocessing=='v3':
+                conform_v3(output_img, output_img)
+             elif version_of_preprocessing=='v1':
+                conform_v1(output_img, output_img)
         #else:
         #   print(file, ' is already preprocessed.')
 
@@ -274,7 +374,6 @@ def main_preprocess():
 
 def main_infer():
     parser = arguments()
-    #set_paths(parser)
     args = parser.parse_args()
     folds = args.folds
     model_path = args.model_path
@@ -294,15 +393,32 @@ def main_infer():
       elif os.path.exists(model_file):
         print('Model exists.')
 
-    print('Segmenting')
+    print('Segmenting.')
     blockPrint()
     inference(parser)
     enablePrint()
 
+def main_brainmask():
+    print('Brain mask extraction.')
+    parser = arguments()
+    args = parser.parse_args()
+    output_folder = args.output_folder
+    for file in glob.glob(os.path.join(output_folder,'*.nii.gz')):
+        file_path , file_name = os.path.split(file)
+        input = os.path.join(output_folder, file_name)
+        filename, file_extension = os.path.splitext(file_name)
+        filename1, file_extension1 = os.path.splitext(filename)
+        output1 = os.path.join(output_folder, filename1 + '_brainmask'+ file_extension1 + file_extension)
+        output2 = os.path.join(output_folder, filename1 + '_seg' + file_extension1 + file_extension)
+        if  (not os.path.isfile(output1)) or (not os.path.isfile(output2)):
+           brainmask_extraction(input, output1, output2)
+           #os.remove(input)        
+
 def main():
     main_preprocess()
     main_infer()
-
+    main_brainmask()
 
 if __name__ == "__main__":
     main()
+

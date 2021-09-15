@@ -1,0 +1,6 @@
+[console_scripts]
+DBSegment = DBSegment.DBSegment:main
+DBSegment_bm = DBSegment.DBSegment:main_brainmask
+DBSegment_infer = DBSegment.DBSegment:main_infer
+DBSegment_prep = DBSegment.DBSegment:main_preprocess
+
