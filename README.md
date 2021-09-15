@@ -17,7 +17,7 @@
   
   `DBSegment -i input_folder -o output_folder -mp path_to_model`
   
- **Inputs** 
+ **Flags** 
   
   **-i**  is the input folder where your MR images are located. The input folder should contain nifti format T1 weighted MRI in *"*.nii.gz"* or *"*.nii"* format.
 
@@ -35,7 +35,7 @@
 
   `-f 4 6`
   
-  **-v**  is the the version of the preprocessing you would liek to aply before segmenation. The default is v3 (LPI oritnation, 1mm voxel spacing, 256 Dimension). The alternative option is v1 (LPI orientaiton). Please note that by chaning the version to v1 the segmenation quality will reduce by 1-2%.
+  **-v**  is the the version of the preprocessing you would like to aply before segmenation. The default is v3 (LPI oritnation, 1mm voxel spacing, 256 Dimension). The alternative option is v1 (LPI orientaiton). Please note that by chaning the version to v1 the segmenation quality will reduce by 1-2%.
 
   `-v v1`
   
