@@ -4,7 +4,7 @@
   
  The tool is available as a pip package. To run the package a GPU is required. 
   
- We highly recommend installing the package inside a virtual environment. For some instruction on virtual envrionments and pip package installation, please refer to: https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/
+ We highly recommend installing the package inside a virtual environment. For some instruction on virtual envrionment and pip package installation, please refer to: https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/
 
 **Installation**
   
@@ -17,7 +17,7 @@
   
   `DBSegment -i input_folder -o output_folder -mp path_to_model`
   
-  Once it is done, two folders will be created, preprocessed_v3 and an output folder. The output folder contains the segmentation of the the 30 brain structures and the rest of the brain, filename.nii.gz, and a brain mask, filename_brainmask.nii.gz. The ouput files should be applied on the preprocessed image in the preprocessed folder, filename_0000.nii.gz.
+  The input folder should contain you input image, e.g. *filename.nii.gz*. Once it is done, two folders will be created, a preprocessed and an output folder. The output folder contains the segmentations of the the 30 brain structures and one label for the rest of the brain, *filename.nii.gz*, a file containing 30 brian structures segmenation, *filename_seg.nii.gz*, and a brain mask, *filename_brainmask.nii.gz*. The ouput files should be applied on the preprocessed image in the preprocessed folder, *filename_0000.nii.gz*.
   
  **Flags** 
   
