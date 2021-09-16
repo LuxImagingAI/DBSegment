@@ -17,6 +17,8 @@
   
   `DBSegment -i input_folder -o output_folder -mp path_to_model`
   
+  Once it is done, two folders will be created, preprocessed_v3 and an output folder. The output folder contains the segmentation of the the 30 brain structures and the rest of the brain, filename.nii.gz, and a brain mask, filename_brainmask.nii.gz. The ouput files should be applied on the preprocessed image in the preprocessed folder, filename_0000.nii.gz.
+  
  **Flags** 
   
   **-i**  is the input folder where your MR images are located. The input folder should contain nifti format T1 weighted MRI in *"*.nii.gz"* or *"*.nii"* format.
