@@ -2,7 +2,7 @@
   
   This tool generates 30 deep brain structures segmentation, as well as a brain mask from T1-Weighted MRI. The whole procedure should take ~1 min for one case.
   
- The tool is available as a pip package. To run the package a GPU is required. 
+ The tool is available as a pip package. **To run the package a GPU is required.**
   
  We highly recommend installing the package inside a virtual environment. For some instruction on virtual envrionment and pip package installation, please refer to: https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/
 
