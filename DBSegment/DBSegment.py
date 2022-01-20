@@ -186,22 +186,23 @@ def conform_v1(input, output):
     new_img.set_data_dtype(img.get_data_dtype())
     nib.save(new_img, output)
 
-def brainmask_extraction(input, output1, output2):
+
+def brainmask_extraction(input, output1):
     img1 = sitk.ReadImage(input)
     brainmask = sitk.BinaryThreshold( img1, 1, 31, 1, 0 )
     sitk.WriteImage(brainmask, output1)
   
-    img2 = nib.load(input)
-    data = img2.get_fdata()
-    data[data==1]=0
-    h1 = MGHHeader.from_header(img2)
-    h1.set_data_shape([256, 256, 256])
-    h1.set_zooms([1, 1, 1])
-    h1['Mdc'] = [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
-    h1['Pxyz_c'] = img2.affine.dot(np.hstack((np.array(img2.shape[:3]) / 2.0, [1])))[:3]
-    labels = nib.MGHImage(data, h1.get_affine(), h1)
-    labels.set_data_dtype(img2.get_data_dtype())
-    nib.save(labels, output2)
+    #img2 = nib.load(input)
+    #data = img2.get_fdata()
+    #data[data==1]=0
+    #h1 = MGHHeader.from_header(img2)
+    #h1.set_data_shape([256, 256, 256])
+    #h1.set_zooms([1, 1, 1])
+    #h1['Mdc'] = [[1, 0, 0], [0, 1, 0], [0, 0, 1]]
+    #h1['Pxyz_c'] = img2.affine.dot(np.hstack((np.array(img2.shape[:3]) / 2.0, [1])))[:3]
+    #labels = nib.MGHImage(data, h1.get_affine(), h1)
+    #labels.set_data_dtype(img2.get_data_dtype())
+    #nib.save(labels, output2)
 
 
 def download_model(parser):
@@ -403,15 +404,18 @@ def main_brainmask():
     parser = arguments()
     args = parser.parse_args()
     output_folder = args.output_folder
+    overwrite_existing = args.overwrite_existing
     for file in glob.glob(os.path.join(output_folder,'*.nii.gz')):
         file_path , file_name = os.path.split(file)
         input = os.path.join(output_folder, file_name)
         filename, file_extension = os.path.splitext(file_name)
         filename1, file_extension1 = os.path.splitext(filename)
         output1 = os.path.join(output_folder, filename1 + '_brainmask'+ file_extension1 + file_extension)
-        output2 = os.path.join(output_folder, filename1 + '_seg' + file_extension1 + file_extension)
-        if  (not os.path.isfile(output1)) or (not os.path.isfile(output2)):
-           brainmask_extraction(input, output1, output2)
+        if not overwrite_existing:
+             if  (not os.path.isfile(output1)):
+                brainmask_extraction(input, output1)
+        elif overwrite_existing:
+             brainmask_extraction(input, output1)
            #os.remove(input)        
 
 def main():

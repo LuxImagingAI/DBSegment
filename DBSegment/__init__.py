@@ -1,5 +1,5 @@
 from __future__ import absolute_import
-print("\n\nPlease cite the following papers when using DBSegment: \n\nMehri Baniasadi, Mikkel V. Petersen, Jorge Goncalves, Andreas Horn, Vanja Vlasov, Frank Hertel, Andreas Husch, DBSegment: Fast and robust segmentation of deep brain structures- Evaluation of transportabilityacross acquisition domains.")
+print("\n\nPlease cite the following papers when using DBSegment: \n\nMehri Baniasadi, Mikkel V. Petersen, Jorge Goncalves, Andreas Horn, Vanja Vlasov, Frank Hertel, Andreas Husch, DBSegment: Fast and robust segmentation of deep brain structures- Evaluation of transportability across acquisition domains.")
 
 print("\n\nIsensee, F., Jaeger, P.F., Kohl, S.A.A. et al. "
       "\"nnU-Net: a self-configuring method for deep learning-based biomedical image segmentation.\" "
