@@ -14,6 +14,9 @@ import SimpleITK as sitk
 
 
 def arguments():
+        """
+        add comments
+        """
     parser = argparse.ArgumentParser()
     
     parser.add_argument('-i', '--input_folder', help="Path to the folder containing the input T1w MRIs", required=True)
@@ -88,6 +91,9 @@ def arguments():
 
 
 def set_paths(parser):
+        """
+        add comments
+        """
        args = parser.parse_args()
        model_path = args.model_path
        folds = args.folds
@@ -123,6 +129,9 @@ enablePrint()
 
 
 def correct_header(input, output):
+        """
+        add comments
+        """
     img1 = nib.load(input)
     corr_affine = img1.get_qform()
     img1.set_sform(corr_affine)
@@ -131,6 +140,9 @@ def correct_header(input, output):
     nib.save(img1, output)
 
 def correct_num_col(input, output):
+        """
+        add comments
+        """
     img1 = nib.load(input)
     aff = img1.get_qform()
     mr_mat = img1.get_fdata()
@@ -146,6 +158,9 @@ def correct_num_col(input, output):
         nib.save(new_mr, output)
 
 def conform_v3(input, output):
+        """
+        add comments
+        """
     img = nib.load(input)
     h1 = MGHHeader.from_header(img)
     
@@ -166,7 +181,9 @@ def conform_v3(input, output):
 
 
 def conform_v1(input, output):
-    
+        """
+        add comments
+        """    
     img = nib.load(input)
     h1 = MGHHeader.from_header(img)
     x1, y1, z1=img.shape[:3]
@@ -188,6 +205,9 @@ def conform_v1(input, output):
 
 
 def brainmask_extraction(input, output1):
+        """
+        add comments
+        """
     img1 = sitk.ReadImage(input)
     brainmask = sitk.BinaryThreshold( img1, 1, 31, 1, 0 )
     sitk.WriteImage(brainmask, output1)
@@ -206,6 +226,9 @@ def brainmask_extraction(input, output1):
 
 
 def download_model(parser):
+        """
+        add comments
+        """
     args = parser.parse_args()
     model_path = args.model_path
     folds = args.folds
@@ -223,6 +246,9 @@ def download_model(parser):
     os.remove(model1)
 
 def inference(parser):
+        """
+        add comments
+        """
     blockPrint()
     args = parser.parse_args()
     version_of_preprocessing = args.version_of_preprocessing
@@ -305,6 +331,9 @@ def inference(parser):
     enablePrint()
 
 def preprocessing(parser):
+        """
+        add comments
+        """
     args = parser.parse_args()
     input = args.input_folder
     input_folder = input
@@ -370,10 +399,16 @@ def preprocessing(parser):
         #   print(file, ' is already preprocessed.')
 
 def main_preprocess():
+        """
+        add comments
+        """
     parser = arguments()
     preprocessing(parser)
 
 def main_infer():
+        """
+        add comments
+        """
     parser = arguments()
     args = parser.parse_args()
     folds = args.folds
@@ -400,6 +435,9 @@ def main_infer():
     enablePrint()
 
 def main_brainmask():
+        """
+        add comments
+        """
     print('Brain mask extraction.')
     parser = arguments()
     args = parser.parse_args()
@@ -419,6 +457,9 @@ def main_brainmask():
            #os.remove(input)        
 
 def main():
+        """
+        add comments
+        """
     main_preprocess()
     main_infer()
     main_brainmask()
