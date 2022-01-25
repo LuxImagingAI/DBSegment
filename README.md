@@ -1,6 +1,8 @@
 # DBSegment <h1>
-  
+ 
+ ## Comand line tool 
   This tool generates 30 deep brain structures segmentation, as well as a brain mask from T1-Weighted MRI. The whole procedure should take ~1 min for one case.
+  For a defintion of the resulting labels refer to the paper or the provided ITK labels file `labels.txt`.
   
  The tool is available as a pip package. **To run the package a GPU is required.**
   
@@ -43,3 +45,11 @@ optional: **-f** folds (networks) used for segmentation inferrence. The availabl
   This Flag is for the test time augmentation. The default is True and tta is disabled, to enable the tta, set this flag to True. By setting the flag to True, the segmenation quality will improve by ~0.2%, and the inference time will increase by 10-20 seconds.
 
   `--disable_tta True`
+
+## Model  
+We provide the trained neural network model for download. The command line tool will automatically download the model files if not present at the first run.
+
+## How to cite 
+  You can find much more information, in particular on robustness across acuqisition domains in the following paper. Please cite this publication when using the tool in own works:
+
+> Mehri Baniasadi, Mikkel V. Petersen, Jorge Goncalves, Vanja Vlasov, Andreas Horn, Frank Hertel, Andreas Husch (2021): Fast and robust segmentation of deep brain structures: Evaluation of transportabilityacross acquisition domain
