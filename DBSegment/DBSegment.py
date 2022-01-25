@@ -130,7 +130,7 @@ enablePrint()
 
 def correct_header(input, output):
         """
-        add comments
+        This function corrects the sforms, qform of the input image.
         """
     img1 = nib.load(input)
     corr_affine = img1.get_qform()
@@ -141,7 +141,8 @@ def correct_header(input, output):
 
 def correct_num_col(input, output):
         """
-        add comments
+        This function corrects the shape of the image. 
+        e.g when it has the shape (1, 256, 256, 256) which can not be input to the preprocessing function.
         """
     img1 = nib.load(input)
     aff = img1.get_qform()
@@ -159,7 +160,9 @@ def correct_num_col(input, output):
 
 def conform_v3(input, output):
         """
-        add comments
+        This function conforms the images to the same orientation, LPI,
+        Same voxel spacing 1mm x 1mm x 1mm,
+        and the same dimension 256 x 256 x 256.
         """
     img = nib.load(input)
     h1 = MGHHeader.from_header(img)
@@ -182,7 +185,7 @@ def conform_v3(input, output):
 
 def conform_v1(input, output):
         """
-        add comments
+        This function conforms the images to the same orientation, LPI.
         """    
     img = nib.load(input)
     h1 = MGHHeader.from_header(img)
@@ -206,7 +209,7 @@ def conform_v1(input, output):
 
 def brainmask_extraction(input, output1):
         """
-        add comments
+        This function extracts the brainmask from the networks output. 
         """
     img1 = sitk.ReadImage(input)
     brainmask = sitk.BinaryThreshold( img1, 1, 31, 1, 0 )
@@ -227,7 +230,10 @@ def brainmask_extraction(input, output1):
 
 def download_model(parser):
         """
-        add comments
+        This function downloads the model. If no folds are set, it downloads fold 4 and 6.
+        If fold is specified as a parameter, it downloads all 6 folds of the network.
+        The model will be saved in the specified path in the -mp parameter, otherwise,
+        the default path is '/usr/local/share/'
         """
     args = parser.parse_args()
     model_path = args.model_path
@@ -246,9 +252,6 @@ def download_model(parser):
     os.remove(model1)
 
 def inference(parser):
-        """
-        add comments
-        """
     blockPrint()
     args = parser.parse_args()
     version_of_preprocessing = args.version_of_preprocessing
