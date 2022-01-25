@@ -1,6 +1,7 @@
 # DBSegment <h1>
 
-  This is a command line tool, that generates 30 deep brain structures segmentation, as well as a brain mask from T1-Weighted MRI. The whole procedure should take ~1 min for one case.
+  ## command line tool 
+  This tool generates 30 deep brain structures segmentation, as well as a brain mask from T1-Weighted MRI. The whole procedure should take ~1 min for one case.
   For a defintion of the resulting labels refer to the paper or the provided ITK labels file `labels.txt`.
   
  The tool is available as a pip package. **To run the package a GPU is required.**
