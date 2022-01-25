@@ -19,23 +19,21 @@
   
   The input folder should contain you input image, e.g. *filename.nii.gz*. Once it is done, two folders will be created, a preprocessed and an output folder. The output folder contains the segmentations of the the 30 brain structures and one label for the rest of the brain, *filename.nii.gz*, a file containing 30 brian structures segmenation, *filename_seg.nii.gz*, and a brain mask, *filename_brainmask.nii.gz*. The ouput files should be applied on the preprocessed image in the preprocessed folder, *filename_0000.nii.gz*.
   
- **Flags** 
-  
-  **-i**  is the input folder where your MR images are located. The input folder should contain nifti format T1 weighted MRI in *"*.nii.gz"* or *"*.nii"* format.
+ **Parameters** 
+
+  **-i** input folder where your MR images are located. The input folder should contain nifti format T1 weighted MRI in *"*.nii.gz"* or *"*.nii"* format.
 
  `-i /Users/mehri.baniasadi/Documents/mr_data`
 
-**-o**  is the output folder where the model outputs the segmentations.
+**-o** output folder where the model outputs the segmentations.
 
  `-o /Users/mehri.baniasadi/Documents/mr_seg`
 
-**-mp**  is the path to save the model. The default is /usr/local/share
+optional: **-mp** path to the trained model. The default is /usr/local/share
 
   `-mp /Users/mehri.baniasadi/Documents/models`
 
-**-f**  are the folds (networks) used for segmentation. The available folds are *0, 1, 2, 3, 4, 5, 6*. The default folds are *4* and *6*. We recommend to keep the default settings, and do not define this parameter.
-
-  `-f 4 6`
+optional: **-f** folds (networks) used for segmentation inferrence. The available folds are *0, 1, 2, 3, 4, 5, 6*. The default folds are *4* and *6*. We recommend to keep the default settings, and do not define this parameter. Using more folds will increase the needed computation time.
   
   **-v**  is the the version of the preprocessing you would like to aply before segmenation. The default is v3 (LPI oritnation, 1mm voxel spacing, 256 Dimension). The alternative option is v1 (LPI orientaiton). Please note that by chaning the version to v1 the segmenation quality will reduce by 1-2%.
 
