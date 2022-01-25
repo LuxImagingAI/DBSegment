@@ -1,6 +1,6 @@
 # DBSegment <h1>
- 
- ## Comand line tool 
+
+  ## Command line tool 
   This tool generates 30 deep brain structures segmentation, as well as a brain mask from T1-Weighted MRI. The whole procedure should take ~1 min for one case.
   For a defintion of the resulting labels refer to the paper or the provided ITK labels file `labels.txt`.
   
@@ -37,11 +37,11 @@ optional: **-mp** path to the trained model. The default is /usr/local/share
 
 optional: **-f** folds (networks) used for segmentation inferrence. The available folds are *0, 1, 2, 3, 4, 5, 6*. The default folds are *4* and *6*. We recommend to keep the default settings, and do not define this parameter. Using more folds will increase the needed computation time.
   
-  **-v**  is the the version of the preprocessing you would like to aply before segmenation. The default is v3 (LPI oritnation, 1mm voxel spacing, 256 Dimension). The alternative option is v1 (LPI orientaiton). Please note that by chaning the version to v1 the segmenation quality will reduce by 1-2%.
+ optional: **-v**  is the the version of the preprocessing you would like to aply before segmenation. The default is v3 (LPI oritnation, 1mm voxel spacing, 256 Dimension). The alternative option is v1 (LPI orientaiton). Please note that by chaning the version to v1 the segmenation quality will reduce by 1-2%.
 
   `-v v1`
   
-  **--disable_tta**
+  optional: **--disable_tta**
   This Flag is for the test time augmentation. The default is True and tta is disabled, to enable the tta, set this flag to True. By setting the flag to True, the segmenation quality will improve by ~0.2%, and the inference time will increase by 10-20 seconds.
 
   `--disable_tta True`
