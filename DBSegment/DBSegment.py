@@ -13,58 +13,55 @@ import torch
 import SimpleITK as sitk
 
 
-def arguments():
-        """
-        add comments
-        """
-    parser = argparse.ArgumentParser()
+def arguments():       
+     parser = argparse.ArgumentParser(description='Model parameters')
     
-    parser.add_argument('-i', '--input_folder', help="Path to the folder containing the input T1w MRIs", required=True)
+     parser.add_argument('-i', '--input_folder', help="Path to the folder containing the input T1w MRIs", required=True)
     
-    parser.add_argument('-o', '--output_folder', required=True, help="This is the path where you would like to save the model predictions")
+     parser.add_argument('-o', '--output_folder', required=True, help="This is the path where you would like to save the model predictions")
 
-    parser.add_argument('-mp', '--model_path', required=False, default='/usr/local/share/',
+     parser.add_argument('-mp', '--model_path', required=False, default='/usr/local/share/',
                                             help="This is the path where you would like to save the model. Default is the /usr/local/share"
                                             "automatically")
                                             
-    parser.add_argument('-v', '--version_of_preprocessing', required=False , default='v3',
+     parser.add_argument('-v', '--version_of_preprocessing', required=False , default='v3',
                                                                 help="You can set this to v1, to change only the orientation of the input image during the preprocessing."
                                                                "It conforms the input image to LPI (itksnap) orientation."
                                                                "This might reduce the quality of the segmentation by 1-2%."
                                                                 "The default is v3, it confomrs the input image to orientation LPI (itksnap), 1mm voxel spacing, and 256 dimension.")
                                             
-    parser.add_argument('-f', '--folds', nargs='+', default='None',
+     parser.add_argument('-f', '--folds', nargs='+', default='None',
                                             help="folds to use for prediction. Default is Fold 4 adn 6."
                                             "You can choose any fold between 0 to 6")
 
-    parser.add_argument('--disable_tta', type=str, required=False, default='None',
+     parser.add_argument('--disable_tta', type=str, required=False, default='None',
                             help="set this flag to False to disable test time data augmentation via mirroring. Speeds up inference "
                             "Default is True")
 
-    parser.add_argument('--overwrite_existing', required=False, default=False, action="store_true",
+     parser.add_argument('--overwrite_existing', required=False, default=False, action="store_true",
                     help="Set this flag if the target folder contains predictions that you would like to overwrite"
                         "Default is False")
     
-    parser.add_argument('--all_in_gpu', type=str, default='None', required=False, help='can be None, False or True. '
+     parser.add_argument('--all_in_gpu', type=str, default='None', required=False, help='can be None, False or True. '
                         "Do not touch, unless you have applied changes in nnunet for running the network on CPU only."
                          "In this case set this flasg to False")
                         
-    parser.add_argument("--num_threads_nifti_save", required=False, default=2, type=int, help=
+     parser.add_argument("--num_threads_nifti_save", required=False, default=2, type=int, help=
                                             "Determines many background processes will be used for segmentation export. Reduce this if you "
                                             "run into out of memory (RAM) problems. Default: 2")
 
-    parser.add_argument('-z', '--save_npz', required=False, action='store_true',
+     parser.add_argument('-z', '--save_npz', required=False, action='store_true',
                     help="use this if you want to ensemble these predictions with those of other models. Softmax "
                     "probabilities will be saved as compressed numpy arrays in output_folder and can be "
                     "merged between output_folders with nnUNet_ensemble_predictions")
     
-    parser.add_argument('-l', '--lowres_segmentations', required=False, default='None',
+     parser.add_argument('-l', '--lowres_segmentations', required=False, default='None',
                         help="if model is the highres stage of the cascade then you can use this folder to provide "
                         "predictions from the low resolution 3D U-Net. If this is left at default, the "
                         "predictions will be generated automatically (provided that the 3D low resolution U-Net "
                         "network weights are present")
         
-    parser.add_argument("--part_id", type=int, required=False, default=0, help="Used to parallelize the prediction of "
+     parser.add_argument("--part_id", type=int, required=False, default=0, help="Used to parallelize the prediction of "
                                             "the folder over several GPUs. If you "
                                             "want to use n GPUs to predict this "
                                             "folder you need to run this command "
@@ -73,7 +70,7 @@ def arguments():
                                             "GPU (for example via "
                                             "CUDA_VISIBLE_DEVICES=X)")
                         
-    parser.add_argument("--num_parts", type=int, required=False, default=1,
+     parser.add_argument("--num_parts", type=int, required=False, default=1,
                                             help="Used to parallelize the prediction of "
                                             "the folder over several GPUs. If you "
                                             "want to use n GPUs to predict this "
@@ -83,28 +80,26 @@ def arguments():
                                             "GPU (via "
                                             "CUDA_VISIBLE_DEVICES=X)")
 
-    parser.add_argument("--num_threads_preprocessing", required=False, default=6, type=int, help=
+     parser.add_argument("--num_threads_preprocessing", required=False, default=6, type=int, help=
                                             "Determines many background processes will be used for data preprocessing. Reduce this if you "
                                             "run into out of memory (RAM) problems. Default: 6")
 
-    return parser
+     return parser
 
 
 def set_paths(parser):
-        """
-        add comments
-        """
-       args = parser.parse_args()
-       model_path = args.model_path
-       folds = args.folds
-       if folds == "None":       
-          os.environ['nnUNet_raw_data_base']= os.path.join(model_path,'deep_brain_seg_model_2f')
-          os.environ['nnUNet_preprocessed']= os.path.join(model_path,'deep_brain_seg_model_2f/preprocess_nnUNet')
-          os.environ['RESULTS_FOLDER']= os.path.join(model_path,'deep_brain_seg_model_2f/model')
-       else:
-          os.environ['nnUNet_raw_data_base']= os.path.join(model_path,'deep_brain_seg_model_7f') 
-          os.environ['nnUNet_preprocessed']= os.path.join(model_path,'deep_brain_seg_model_7f/preprocess_nnUNet')
-          os.environ['RESULTS_FOLDER']= os.path.join(model_path,'deep_brain_seg_model_7f/model')        
+   
+    args = parser.parse_args()
+    model_path = args.model_path
+    folds = args.folds
+    if folds == "None":       
+        os.environ['nnUNet_raw_data_base']= os.path.join(model_path,'deep_brain_seg_model_2f')
+        os.environ['nnUNet_preprocessed']= os.path.join(model_path,'deep_brain_seg_model_2f/preprocess_nnUNet')
+        os.environ['RESULTS_FOLDER']= os.path.join(model_path,'deep_brain_seg_model_2f/model')
+    else:
+        os.environ['nnUNet_raw_data_base']= os.path.join(model_path,'deep_brain_seg_model_7f') 
+        os.environ['nnUNet_preprocessed']= os.path.join(model_path,'deep_brain_seg_model_7f/preprocess_nnUNet')
+        os.environ['RESULTS_FOLDER']= os.path.join(model_path,'deep_brain_seg_model_7f/model')        
 
 parser = arguments()
 set_paths(parser)
@@ -119,31 +114,31 @@ def enablePrint():
 
 blockPrint()
 
-
-from nnunet.inference.predict import predict_from_folder
-from nnunet.paths import default_plans_identifier, network_training_output_dir, default_cascade_trainer, default_trainer
+import DBSegment.nnunet
+from DBSegment.nnunet.inference.predict import predict_from_folder
+from DBSegment.nnunet.paths import default_plans_identifier, network_training_output_dir, default_cascade_trainer, default_trainer
 from batchgenerators.utilities.file_and_folder_operations import join, isdir
-from nnunet.utilities.task_name_id_conversion import convert_id_to_task_name
+from DBSegment.nnunet.utilities.task_name_id_conversion import convert_id_to_task_name
 enablePrint()
 
 
 
 def correct_header(input, output):
-        """
+     """
         This function corrects the sforms, qform of the input image.
-        """
-    img1 = nib.load(input)
-    corr_affine = img1.get_qform()
-    img1.set_sform(corr_affine)
-    img1.update_header()
-    img1.set_data_dtype(img1.get_data_dtype())
-    nib.save(img1, output)
+     """
+     img1 = nib.load(input)
+     corr_affine = img1.get_qform()
+     img1.set_sform(corr_affine)
+     img1.update_header()
+     img1.set_data_dtype(img1.get_data_dtype())
+     nib.save(img1, output)
 
 def correct_num_col(input, output):
-        """
+    """
         This function corrects the shape of the image. 
         e.g when it has the shape (1, 256, 256, 256) which can not be input to the preprocessing function.
-        """
+    """
     img1 = nib.load(input)
     aff = img1.get_qform()
     mr_mat = img1.get_fdata()
@@ -159,11 +154,11 @@ def correct_num_col(input, output):
         nib.save(new_mr, output)
 
 def conform_v3(input, output):
-        """
+    """
         This function conforms the images to the same orientation, LPI,
         Same voxel spacing 1mm x 1mm x 1mm,
         and the same dimension 256 x 256 x 256.
-        """
+    """
     img = nib.load(input)
     h1 = MGHHeader.from_header(img)
     
@@ -184,9 +179,9 @@ def conform_v3(input, output):
 
 
 def conform_v1(input, output):
-        """
+    """
         This function conforms the images to the same orientation, LPI.
-        """    
+    """    
     img = nib.load(input)
     h1 = MGHHeader.from_header(img)
     x1, y1, z1=img.shape[:3]
@@ -208,9 +203,9 @@ def conform_v1(input, output):
 
 
 def brainmask_extraction(input, output1):
-        """
+    """
         This function extracts the brainmask from the networks output. 
-        """
+    """
     img1 = sitk.ReadImage(input)
     brainmask = sitk.BinaryThreshold( img1, 1, 31, 1, 0 )
     sitk.WriteImage(brainmask, output1)
@@ -229,12 +224,12 @@ def brainmask_extraction(input, output1):
 
 
 def download_model(parser):
-        """
+    """
         This function downloads the model. If no folds are set, it downloads fold 4 and 6.
         If fold is specified as a parameter, it downloads all 6 folds of the network.
         The model will be saved in the specified path in the -mp parameter, otherwise,
         the default path is '/usr/local/share/'
-        """
+    """
     args = parser.parse_args()
     model_path = args.model_path
     folds = args.folds
@@ -259,9 +254,12 @@ def inference(parser):
        directory = 'preprocessed_v3'
     elif version_of_preprocessing=='v1':
        directory = 'preprocessed_v1'
-    path = os.path.join(args.input_folder, directory)
+    input_folder = args.input_folder
+    input_folder = os.path.abspath(input_folder)
+    path = os.path.join(input_folder, directory)
     input_folder = path
     output_folder = args.output_folder
+    output_folder = os.path.abspath(output_folder)
     part_id = args.part_id
     num_parts = args.num_parts
     folds = args.folds
@@ -334,15 +332,16 @@ def inference(parser):
     enablePrint()
 
 def preprocessing(parser):
-        """
+    """
         add comments
-        """
+    """
     args = parser.parse_args()
-    input = args.input_folder
-    input_folder = input
+    input_folder = args.input_folder
+    #input_folder = input
+    input_folder = os.path.abspath(input_folder)
     overwrite_existing = args.overwrite_existing
     version_of_preprocessing = args.version_of_preprocessing
-    os.chdir(input)
+    #os.chdir(input_folder)
     if version_of_preprocessing=='v3':
         directory = 'preprocessed_v3'
     elif version_of_preprocessing=='v1':
@@ -402,16 +401,16 @@ def preprocessing(parser):
         #   print(file, ' is already preprocessed.')
 
 def main_preprocess():
-        """
+    """
         add comments
-        """
+    """
     parser = arguments()
     preprocessing(parser)
 
 def main_infer():
-        """
+    """
         add comments
-        """
+    """
     parser = arguments()
     args = parser.parse_args()
     folds = args.folds
@@ -438,13 +437,14 @@ def main_infer():
     enablePrint()
 
 def main_brainmask():
-        """
+    """
         add comments
-        """
+    """
     print('Brain mask extraction.')
     parser = arguments()
     args = parser.parse_args()
     output_folder = args.output_folder
+    output_folder = os.path.abspath(output_folder)
     overwrite_existing = args.overwrite_existing
     for file in glob.glob(os.path.join(output_folder,'*.nii.gz')):
         file_path , file_name = os.path.split(file)
@@ -460,9 +460,9 @@ def main_brainmask():
            #os.remove(input)        
 
 def main():
-        """
+    """
         add comments
-        """
+    """
     main_preprocess()
     main_infer()
     main_brainmask()
