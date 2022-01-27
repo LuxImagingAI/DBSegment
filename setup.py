@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 import codecs
 import os
 
-VERSION = '0.1.3'
+VERSION = '0.1.4'
 DESCRIPTION = 'A deep learnign based method to segment deep brain structures from T1w MRI'
 # Setting up
 setup(
@@ -27,7 +27,8 @@ setup(
                         "pandas",
                         "requests",
                         "tifffile", 
-                        "matplotlib",],
+                        "matplotlib",
+                        "antspyx"],
       entry_points={
       'console_scripts': [
                           "DBSegment = DBSegment.DBSegment:main",

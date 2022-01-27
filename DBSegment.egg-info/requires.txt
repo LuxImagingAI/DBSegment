@@ -13,3 +13,4 @@ pandas
 requests
 tifffile
 matplotlib
+antspyx

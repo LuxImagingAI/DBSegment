@@ -33,6 +33,10 @@ def arguments():
      parser.add_argument('-f', '--folds', nargs='+', default='None',
                                             help="folds to use for prediction. Default is Fold 4 adn 6."
                                             "You can choose any fold between 0 to 6")
+                                            
+     parser.add_argument('-n', '--convert_to_native', required=False, default=True, action="store_true",
+                    help="Set this flag if the target folder contains predictions that you would like to overwrite"
+                        "Default is False")                                            
 
      parser.add_argument('--disable_tta', type=str, required=False, default='None',
                             help="set this flag to False to disable test time data augmentation via mirroring. Speeds up inference "
@@ -256,10 +260,10 @@ def inference(parser):
        directory = 'preprocessed_v1'
     input_folder = args.input_folder
     input_folder = os.path.abspath(input_folder)
-    path = os.path.join(input_folder, directory)
-    input_folder = path
+    input_folder = os.path.join(input_folder, directory)
     output_folder = args.output_folder
     output_folder = os.path.abspath(output_folder)
+    output_folder = os.path.join(output_folder, directory)
     part_id = args.part_id
     num_parts = args.num_parts
     folds = args.folds
@@ -399,6 +403,38 @@ def preprocessing(parser):
                 conform_v1(output_img, output_img)
         #else:
         #   print(file, ' is already preprocessed.')
+        
+def transfer_to_native(mr_prep_str, mr_native_str, seg_prep_str, seg_native_str, brainmask_prep_str, brainmask_native_str):
+    from ants import apply_transforms, registration, image_read
+    import numpy
+    seg_prep = image_read(seg_prep_str)
+    mr_prep = image_read(mr_prep_str)
+    mr_native = image_read(mr_native_str)
+    brainmask_prep = image_read(brainmask_prep_str)
+    #print(mr_native)
+    #print('count nan values: ', np.sum(np.isnan(mr_native.numpy())))
+    #print(mr_native.numpy())
+    #new_array=mr_native.numpy()
+    #new_array[np.isnan(new_array)]=0
+    #print(new_array) 
+    #mr_native.new_image_like(new_array)
+    #print(mr_native.numpy())
+    if (np.sum(np.isnan(mr_native.numpy())) > 0):
+        print('Error: There are nan values in the original image. conversion to native is not possible.')
+    else:        
+        aff = registration(mr_native, mr_prep, "Affine" )
+        mywarpedimage = apply_transforms( fixed = mr_native, 
+                                       moving = seg_prep, 
+                                       transformlist = aff['fwdtransforms'],
+                                       interpolator  = 'genericLabel') 
+        mywarpedimage_bm = apply_transforms( fixed = mr_native, 
+                                       moving = brainmask_prep, 
+                                       transformlist = aff['fwdtransforms'],
+                                       interpolator  = 'genericLabel')                                       
+        mywarpedimage.to_file(seg_native_str)
+        mywarpedimage_bm.to_file(brainmask_native_str)
+
+            
 
 def main_preprocess():
     """
@@ -406,7 +442,7 @@ def main_preprocess():
     """
     parser = arguments()
     preprocessing(parser)
-
+    
 def main_infer():
     """
         add comments
@@ -444,7 +480,14 @@ def main_brainmask():
     parser = arguments()
     args = parser.parse_args()
     output_folder = args.output_folder
+    version_of_preprocessing = args.version_of_preprocessing
+    if version_of_preprocessing=='v3':
+            directory = 'preprocessed_v3'
+    elif version_of_preprocessing=='v1':
+            directory = 'preprocessed_v1'
+            
     output_folder = os.path.abspath(output_folder)
+    output_folder = os.path.join(output_folder, directory)
     overwrite_existing = args.overwrite_existing
     for file in glob.glob(os.path.join(output_folder,'*.nii.gz')):
         file_path , file_name = os.path.split(file)
@@ -453,11 +496,75 @@ def main_brainmask():
         filename1, file_extension1 = os.path.splitext(filename)
         output1 = os.path.join(output_folder, filename1 + '_brainmask'+ file_extension1 + file_extension)
         if not overwrite_existing:
-             if  (not os.path.isfile(output1)):
+             if  (not os.path.isfile(output1)) and ('_brainmask' not in filename1):
                 brainmask_extraction(input, output1)
         elif overwrite_existing:
              brainmask_extraction(input, output1)
-           #os.remove(input)        
+     
+           
+def main_to_native():
+    
+    parser = arguments()
+    args = parser.parse_args()
+    convert_to_native = args.convert_to_native
+    if convert_to_native:
+        print('Transforming to native space.')
+        input_folder = args.input_folder
+        output_folder = args.output_folder
+        overwrite_existing = args.overwrite_existing
+        version_of_preprocessing = args.version_of_preprocessing
+    
+        if version_of_preprocessing=='v3':
+            directory = 'preprocessed_v3'
+        elif version_of_preprocessing=='v1':
+            directory = 'preprocessed_v1'
+    
+        input_mr_native = os.path.abspath(input_folder)    
+        input_mr_preprocessed = os.path.join(input_mr_native, directory)
+        output_seg_preprocessed = os.path.abspath(output_folder)
+        output_seg_preprocessed = os.path.join(output_seg_preprocessed, directory)
+        output_seg_native = os.path.abspath(output_folder)
+        if not os.path.exists(output_seg_native):
+            os.mkdir(output_seg_native)
+
+        for file in glob.glob(os.path.join(input_mr_native,'*.nii')):
+            mr_native_str = file
+            print(file)
+            file_path , file_name = os.path.split(file)
+            filename, file_extension = os.path.splitext(file_name)
+            mr_prep_str = os.path.join(input_mr_preprocessed, filename + '_0000' + file_extension + '.gz')
+            seg_prep_str = os.path.join(output_seg_preprocessed, filename + file_extension + '.gz')
+            seg_native_str = os.path.join(output_seg_native, filename + file_extension + '.gz')
+            brainmask_prep_str = os.path.join(output_seg_preprocessed, filename + '_brainmask' + file_extension + '.gz')
+            brainmask_native_str = os.path.join(output_seg_native, filename + '_brainmask' + file_extension + '.gz')
+                
+            if not overwrite_existing:
+                if  (not os.path.isfile(seg_native_str)):
+                     transfer_to_native(mr_prep_str, mr_native_str, seg_prep_str, seg_native_str, brainmask_prep_str, brainmask_native_str)
+                elif overwrite_existing:
+                     transfer_to_native(mr_prep_str, mr_native_str, seg_prep_str, seg_native_str, brainmask_prep_str, brainmask_native_str)
+                     
+        
+        for file in glob.glob(os.path.join(input_mr_native,'*.nii.gz')):
+            mr_native_str = file
+            file_path , file_name = os.path.split(file)
+            filename, file_extension = os.path.splitext(file_name)
+            filename1, file_extension1 = os.path.splitext(filename)
+            mr_prep_str = os.path.join(input_mr_preprocessed,  filename1 + '_0000' + file_extension1 + file_extension)
+            seg_prep_str = os.path.join(output_seg_preprocessed, filename1 + file_extension1 + file_extension)
+            seg_native_str = os.path.join(output_seg_native, filename1 + file_extension1 + file_extension)
+            brainmask_prep_str = os.path.join(output_seg_preprocessed, filename1 + '_brainmask' + file_extension1 + file_extension)
+            brainmask_native_str = os.path.join(output_seg_native, filename1 + '_brainmask' + file_extension1 + file_extension)
+                
+            if not overwrite_existing:
+                 if  (not os.path.isfile(seg_native_str)):
+                        transfer_to_native(mr_prep_str, mr_native_str, seg_prep_str, seg_native_str, brainmask_prep_str, brainmask_native_str)
+            elif overwrite_existing:
+                transfer_to_native(mr_prep_str, mr_native_str, seg_prep_str, seg_native_str, brainmask_prep_str, brainmask_native_str)
+    else:
+       print('No conversion to native was requested. No native folder will be created.')
+             
+
 
 def main():
     """
@@ -466,6 +573,7 @@ def main():
     main_preprocess()
     main_infer()
     main_brainmask()
+    main_to_native()
 
 if __name__ == "__main__":
     main()
