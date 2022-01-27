@@ -404,13 +404,12 @@ def preprocessing(parser):
         #else:
         #   print(file, ' is already preprocessed.')
         
-def transfer_to_native(mr_prep_str, mr_native_str, seg_prep_str, seg_native_str, brainmask_prep_str, brainmask_native_str):
+def transfer_to_native(mr_prep_str, mr_native_str, seg_prep_str, seg_native_str):
     from ants import apply_transforms, registration, image_read
     import numpy
     seg_prep = image_read(seg_prep_str)
     mr_prep = image_read(mr_prep_str)
     mr_native = image_read(mr_native_str)
-    brainmask_prep = image_read(brainmask_prep_str)
     #print(mr_native)
     #print('count nan values: ', np.sum(np.isnan(mr_native.numpy())))
     #print(mr_native.numpy())
@@ -427,12 +426,12 @@ def transfer_to_native(mr_prep_str, mr_native_str, seg_prep_str, seg_native_str,
                                        moving = seg_prep, 
                                        transformlist = aff['fwdtransforms'],
                                        interpolator  = 'genericLabel') 
-        mywarpedimage_bm = apply_transforms( fixed = mr_native, 
-                                       moving = brainmask_prep, 
-                                       transformlist = aff['fwdtransforms'],
-                                       interpolator  = 'genericLabel')                                       
+        #mywarpedimage_bm = apply_transforms( fixed = mr_native, 
+        #                               moving = brainmask_prep, 
+        #                               transformlist = aff['fwdtransforms'],
+        #                               interpolator  = 'genericLabel')                                       
         mywarpedimage.to_file(seg_native_str)
-        mywarpedimage_bm.to_file(brainmask_native_str)
+        #mywarpedimage_bm.to_file(brainmask_native_str)
 
             
 
@@ -480,14 +479,8 @@ def main_brainmask():
     parser = arguments()
     args = parser.parse_args()
     output_folder = args.output_folder
-    version_of_preprocessing = args.version_of_preprocessing
-    if version_of_preprocessing=='v3':
-            directory = 'preprocessed_v3'
-    elif version_of_preprocessing=='v1':
-            directory = 'preprocessed_v1'
             
     output_folder = os.path.abspath(output_folder)
-    output_folder = os.path.join(output_folder, directory)
     overwrite_existing = args.overwrite_existing
     for file in glob.glob(os.path.join(output_folder,'*.nii.gz')):
         file_path , file_name = os.path.split(file)
@@ -535,14 +528,14 @@ def main_to_native():
             mr_prep_str = os.path.join(input_mr_preprocessed, filename + '_0000' + file_extension + '.gz')
             seg_prep_str = os.path.join(output_seg_preprocessed, filename + file_extension + '.gz')
             seg_native_str = os.path.join(output_seg_native, filename + file_extension + '.gz')
-            brainmask_prep_str = os.path.join(output_seg_preprocessed, filename + '_brainmask' + file_extension + '.gz')
-            brainmask_native_str = os.path.join(output_seg_native, filename + '_brainmask' + file_extension + '.gz')
+            #brainmask_prep_str = os.path.join(output_seg_preprocessed, filename + '_brainmask' + file_extension + '.gz')
+            #brainmask_native_str = os.path.join(output_seg_native, filename + '_brainmask' + file_extension + '.gz')
                 
             if not overwrite_existing:
                 if  (not os.path.isfile(seg_native_str)):
-                     transfer_to_native(mr_prep_str, mr_native_str, seg_prep_str, seg_native_str, brainmask_prep_str, brainmask_native_str)
+                     transfer_to_native(mr_prep_str, mr_native_str, seg_prep_str, seg_native_str)
                 elif overwrite_existing:
-                     transfer_to_native(mr_prep_str, mr_native_str, seg_prep_str, seg_native_str, brainmask_prep_str, brainmask_native_str)
+                     transfer_to_native(mr_prep_str, mr_native_str, seg_prep_str, seg_native_str)
                      
         
         for file in glob.glob(os.path.join(input_mr_native,'*.nii.gz')):
@@ -553,14 +546,14 @@ def main_to_native():
             mr_prep_str = os.path.join(input_mr_preprocessed,  filename1 + '_0000' + file_extension1 + file_extension)
             seg_prep_str = os.path.join(output_seg_preprocessed, filename1 + file_extension1 + file_extension)
             seg_native_str = os.path.join(output_seg_native, filename1 + file_extension1 + file_extension)
-            brainmask_prep_str = os.path.join(output_seg_preprocessed, filename1 + '_brainmask' + file_extension1 + file_extension)
-            brainmask_native_str = os.path.join(output_seg_native, filename1 + '_brainmask' + file_extension1 + file_extension)
+            #brainmask_prep_str = os.path.join(output_seg_preprocessed, filename1 + '_brainmask' + file_extension1 + file_extension)
+            #brainmask_native_str = os.path.join(output_seg_native, filename1 + '_brainmask' + file_extension1 + file_extension)
                 
             if not overwrite_existing:
                  if  (not os.path.isfile(seg_native_str)):
-                        transfer_to_native(mr_prep_str, mr_native_str, seg_prep_str, seg_native_str, brainmask_prep_str, brainmask_native_str)
+                        transfer_to_native(mr_prep_str, mr_native_str, seg_prep_str, seg_native_str)
             elif overwrite_existing:
-                transfer_to_native(mr_prep_str, mr_native_str, seg_prep_str, seg_native_str, brainmask_prep_str, brainmask_native_str)
+                transfer_to_native(mr_prep_str, mr_native_str, seg_prep_str, seg_native_str)
     else:
        print('No conversion to native was requested. No native folder will be created.')
              
@@ -572,8 +565,8 @@ def main():
     """
     main_preprocess()
     main_infer()
-    main_brainmask()
     main_to_native()
+    main_brainmask()
 
 if __name__ == "__main__":
     main()
