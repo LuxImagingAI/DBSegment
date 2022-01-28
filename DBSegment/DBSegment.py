@@ -36,7 +36,11 @@ def arguments():
                                             
      parser.add_argument('-n', '--convert_to_native', required=False, default=True, action="store_true",
                     help="Set this flag if the target folder contains predictions that you would like to overwrite"
-                        "Default is False")                                            
+                        "Default is False") 
+                        
+     parser.add_argument('-ss', "--sub_stn", type=int, required=False, default=0, help='This is to define which network to use for segmenation.'
+                                            "Network 0 contains the STN as a whole structure."
+                                            "Network 1 contains STN substrucures.")                                                                   
 
      parser.add_argument('--disable_tta', type=str, required=False, default='None',
                             help="set this flag to False to disable test time data augmentation via mirroring. Speeds up inference "
@@ -135,7 +139,9 @@ def correct_header(input, output):
      corr_affine = img1.get_qform()
      img1.set_sform(corr_affine)
      img1.update_header()
-     img1.set_data_dtype(img1.get_data_dtype())
+     #img1.set_data_dtype(img1.get_data_dtype())
+     img1.set_data_dtype(np.uint8)
+     
      nib.save(img1, output)
 
 def correct_num_col(input, output):
@@ -237,11 +243,25 @@ def download_model(parser):
     args = parser.parse_args()
     model_path = args.model_path
     folds = args.folds
-
-    if folds == "None":
-       url = 'https://webdav-r3lab.uni.lu/public/deep_brain_seg/deep_brain_seg_model_2f.zip'
+    network_number = args.sub_stn
+    if network_number == 0:    
+        if folds == "None":
+            url = 'https://webdav-r3lab.uni.lu/public/deep_brain_seg/deep_brain_seg_model_2f.zip'
+        else:
+            url = 'https://webdav-r3lab.uni.lu/public/deep_brain_seg/deep_brain_seg_model_7f.zip'
+    elif network_number == 1:
+        if folds == "None":
+            url = 'https://webdav-r3lab.uni.lu/public/deep_brain_seg/deep_brain_seg_model_1_2f.zip'
+        else:
+            url = 'https://webdav-r3lab.uni.lu/public/deep_brain_seg/deep_brain_seg_model_1_7f.zip'
     else:
-       url = 'https://webdav-r3lab.uni.lu/public/deep_brain_seg/deep_brain_seg_model_7f.zip'
+        print('Please set the network_number equal to 0 or 1. Other model numbers are not valid.')
+            
+
+    #if folds == "None":
+    #   url = 'https://webdav-r3lab.uni.lu/public/deep_brain_seg/deep_brain_seg_model_2f.zip'
+    #else:
+    #   url = 'https://webdav-r3lab.uni.lu/public/deep_brain_seg/deep_brain_seg_model_7f.zip'
 
     r = requests.get(url, allow_redirects=True)
     model1 = model_path + 'deep_brain_seg_model.zip'
@@ -277,9 +297,15 @@ def inference(parser):
     mode = "normal"
     all_in_gpu = args.all_in_gpu
     model = '3d_fullres'
+    
     trainer_class_name = default_trainer
     cascade_trainer_class_name = default_cascade_trainer
-    task_name = 'Task054_Mri'
+    network_number = args.sub_stn
+    if network_number == 0:    
+        task_name = 'Task054_Mri'
+    else:
+        task_name = 'Task062_Mri'
+        
     args.plans_identifier = default_plans_identifier
     args.disable_mixed_precision = False
     args.chk = 'model_final_checkpoint'
@@ -450,7 +476,11 @@ def main_infer():
     args = parser.parse_args()
     folds = args.folds
     model_path = args.model_path
-    model_path_second_part = 'model/nnUNet/3d_fullres/Task054_Mri/nnUNetTrainerV2__nnUNetPlansv2.1'
+    network_number = args.sub_stn
+    if network_number == 0:
+        model_path_second_part = 'model/nnUNet/3d_fullres/Task054_Mri/nnUNetTrainerV2__nnUNetPlansv2.1'
+    else:
+        model_path_second_part = 'model/nnUNet/3d_fullres/Task062_Mri/nnUNetTrainerV2__nnUNetPlansv2.1'
     if folds == "None":
       model_file = os.path.join(model_path, 'deep_brain_seg_model_2f',model_path_second_part)
       if not os.path.exists(model_file):  
