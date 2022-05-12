@@ -31,7 +31,7 @@
 
  `-o /Users/mehri.baniasadi/Documents/mr_seg`
 
-optional: **-mp** path to store the model. The default is /usr/local/share. 
+optional: **-mp** path to store the model that will be downloaded automatically. The default is /usr/local/share. 
 
   `-mp /Users/mehri.baniasadi/Documents/models`
 
