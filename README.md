@@ -8,6 +8,13 @@
   
  We highly recommend installing the package inside a virtual environment. For some instruction on virtual envrionment and pip package installation, please refer to: https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/
 
+  **Installation using Docker**
+  
+ 1. Install Docker.
+ 2. Pull the DBSegment image `docker pull mehrib/dbsegment:v2`. You Need to do this just the first time. 
+ 3. Run the image `docker run -v "/input_folder/:/input/" -v "/output_folder/output/:/output/" mehrib/dbsegment:v2`
+  
+  
 **Installation**
   
   `pip install DBSegment`
