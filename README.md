@@ -15,7 +15,7 @@
  3. Run the image `docker run -v "/input_folder/:/input/" -v "/output_folder/output/:/output/" mehrib/dbsegment:v2`
   
   
-**Installation**
+**Installation using pip**
   
   `pip install DBSegment`
    
