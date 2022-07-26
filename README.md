@@ -31,7 +31,7 @@
 
  `-o /Users/mehri.baniasadi/Documents/mr_seg`
 
-optional: **-mp** path to the trained model. The default is /usr/local/share
+optional: **-mp** path to store the model that will be downloaded automatically. The default is /usr/local/share. 
 
   `-mp /Users/mehri.baniasadi/Documents/models`
 
@@ -39,7 +39,7 @@ optional: **-f** folds (networks) used for segmentation inferrence. The availabl
   
  optional: **-v**  is the the version of the preprocessing you would like to aply before segmenation. The default is v3 (LPI oritnation, 1mm voxel spacing, 256 Dimension). The alternative option is v1 (LPI orientaiton). Please note that by chaning the version to v1 the segmenation quality will reduce by 1-2%.
 
-  `-v v1`
+  `-v v3`
   
   optional: **--disable_tta**
   This Flag is for the test time augmentation. The default is True and tta is disabled, to enable the tta, set this flag to True. By setting the flag to True, the segmenation quality will improve by ~0.2%, and the inference time will increase by 10-20 seconds.

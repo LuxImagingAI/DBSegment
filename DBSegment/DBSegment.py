@@ -499,7 +499,7 @@ def main_infer():
     print('Segmenting.')
     blockPrint()
     inference(parser)
-    enablePrint()
+    
 
 def main_brainmask():
     """
@@ -531,7 +531,7 @@ def main_to_native():
     args = parser.parse_args()
     convert_to_native = args.convert_to_native
     if convert_to_native:
-        print('Transforming to native space.')
+        print('Transforming to the native space.')
         input_folder = args.input_folder
         output_folder = args.output_folder
         overwrite_existing = args.overwrite_existing
@@ -595,6 +595,7 @@ def main():
     """
     main_preprocess()
     main_infer()
+    enablePrint()
     main_to_native()
     main_brainmask()
 
