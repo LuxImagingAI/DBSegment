@@ -11,7 +11,7 @@
   **Installation using Docker**
   
  1. Install Docker.
- 2. Pull the DBSegment image `docker pull mehrib/dbsegment:v2`. You Need to do this just the first time. 
+ 2. Pull the DBSegment image `docker pull mehrib/dbsegment:v4`. You Need to do this just the first time. 
  3. Run the image `docker run -v "/input_folder/:/input/" -v "/output_folder/output/:/output/" mehrib/dbsegment:v4`
   
   
