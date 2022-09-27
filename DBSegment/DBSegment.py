@@ -11,6 +11,7 @@ import zipfile
 import argparse
 import torch
 import SimpleITK as sitk
+import warnings
 
 
 def arguments():       
@@ -593,6 +594,7 @@ def main():
     """
         add comments
     """
+    warnings.filterwarnings("ignore", message=r'(.*)(CUDA is not available)(.*)' )
     main_preprocess()
     main_infer()
     enablePrint()
