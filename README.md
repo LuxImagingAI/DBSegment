@@ -6,7 +6,8 @@
   
  The tool is available as a pip package. **The package works on both GPU and CPU.**
   
- We highly recommend installing the package inside a virtual environment. For some instruction on virtual envrionment and pip package installation, please refer to: https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/
+ We highly recommend installing the package inside a virtual environment. For some instruction on virtual envrionment and pip package installation, please refer to: https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/.  
+  We also strongly recommend to work with two dedicated and separate _input_ and _output_ folders inside the project folder. This avoids any possible naming conflict.
 
   **Installation using Docker**
   
