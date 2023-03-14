@@ -16,7 +16,7 @@
  3. Run the image `docker run -v "/input_folder/:/input/" -v "/output_folder/output/:/output/" mehrib/dbsegment:v4`
   
  Comment for M1 users: the third step adapted for M1 users is:
- 3. Run the image `docker run --platform Linux/amd64 -v "/input_folder/:/input/" -v "/output_folder/output/:/output/" mehrib/dbsegment:v4`
+ 3. Run the image `docker run --platform Linux/amd64 -v "/input_folder/:/input/" -v "/output_folder/:/output/" mehrib/dbsegment:v4`
  
  However, errors related to recognizing the nifti image in the folder might remain.
  
