@@ -12,6 +12,7 @@ import argparse
 import torch
 import SimpleITK as sitk
 import warnings
+import platform
 
 
 def arguments():       
@@ -21,8 +22,12 @@ def arguments():
     
      parser.add_argument('-o', '--output_folder', required=True, help="This is the path where you would like to save the model predictions")
 
-     parser.add_argument('-mp', '--model_path', required=False, default='/usr/local/share/',
-                                            help="This is the path where you would like to save the model. Default is the /usr/local/share"
+     if (platform.system() != 'Darwin'):
+          default_path = '/usr/local/share/'
+     else:
+          default_path = 'os.path.expanduser("~")' # to avoid sudo restrictions
+     parser.add_argument('-mp', '--model_path', required=False, default=default_path,
+                                            help="This is the path where you would like to save the model. Default is the /usr/local/share for Linux or your user path on MacOS"
                                             "automatically")
                                             
      parser.add_argument('-v', '--version_of_preprocessing', required=False , default='v3',
