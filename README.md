@@ -7,7 +7,8 @@
  The tool is available as a pip package. **The package works on both GPU and CPU.**
   
  We highly recommend installing the package inside a virtual environment. For some instruction on virtual envrionment and pip package installation, please refer to: https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/.  
-  We also strongly recommend to work with two dedicated and separate _input_ and _output_ folders inside the project folder. This avoids any possible naming conflict.
+  We also strongly recommend to work with two dedicated and separate _input_ and _output_ folders inside the project folder. This avoids any possible naming conflict.  
+
 
   **Installation using Docker**
   
@@ -15,7 +16,7 @@
  2. Pull the DBSegment image `docker pull mehrib/dbsegment:v4`. You Need to do this just the first time. 
  3. Run the image `docker run -v "/input_folder/:/input/" -v "/output_folder/output/:/output/" mehrib/dbsegment:v4`
   
- Comment for M1 users: the third step adapted for M1 users is:
+ Comment for *M1 users*: the third step adapted for M1 users is:
  3. Run the image `docker run --platform Linux/amd64 -v "/input_folder/:/input/" -v "/output_folder/:/output/" mehrib/dbsegment:v4`
  
  However, errors related to recognizing the nifti image in the folder might remain.
