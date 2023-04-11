@@ -15,7 +15,7 @@
  2. Pull the DBSegment image `docker pull mehrib/dbsegment:v4`. You Need to do this just the first time. 
  3. Run the image `docker run -v "/input_folder/:/input/" -v "/output_folder/output/:/output/" mehrib/dbsegment:v4`
   
- Comment for M1 users: the third step adapted for M1 users is:
+ *Comment for M1 users*: the third step adapted for M1 users is:
  3. Run the image `docker run --platform Linux/amd64 -v "/input_folder/:/input/" -v "/output_folder/:/output/" mehrib/dbsegment:v4`
  
  **Errors related to recognizing the nifti image in the folder might remain for M1 users.**
@@ -31,7 +31,7 @@
   
   `DBSegment -i input_folder -o output_folder -mp path_to_model`
   
-  The input folder should contain you input image, e.g. *filename.nii.gz*. Once it is done, two folders will be created, a preprocessed and an output folder. The output folder contains the segmentations of the the 30 brain structures and one label for the rest of the brain, *filename.nii.gz*, a file containing 30 brain structures segmenation, *filename_seg.nii.gz*, and a brain mask, *filename_brainmask.nii.gz*. The ouput files should be applied on the preprocessed image in the preprocessed folder, *filename_0000.nii.gz*.
+  The input folder should contain you input image, e.g. *filename.nii.gz*. Once it is done, two folders will be created, a preprocessed and an output folder. The output folder contains the segmentations of the the 30 brain structures and one label for the rest of the brain, filename.nii.gz, and a brain mask, filename_brainmask.nii.gz. The ouput files are applied on the preprocessed image in the preprocessed folder, *filename_0000.nii.gz*.
   
  **Parameters** 
 
