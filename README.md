@@ -48,7 +48,7 @@ optional: **-mp** path to store the model that will be downloaded automatically.
 
   `-mp /Users/mehri.baniasadi/Documents/models`
 
-optional: **-f** folds (networks) used for segmentation inferrence. The available folds are *0, 1, 2, 3, 4, 5, 6*. The default folds are *4* and *6*. We recommend to keep the default settings, and do not define this parameter. Using more folds will increase the needed computation time.
+optional: **-f** folds (networks) used for segmentation inferrence. The available folds are *0, 1, 2, 3, 4, 5, 6*. The default folds are *4* and *6*.   Using more folds will increase the needed computation time but potentially improve segmentation quality.
   
  optional: **-v**  is the the version of the preprocessing applied before segmenation. The default is v3 (LPI orienatation, 1mm voxel spacing, 256 Dimension). The alternative option avialable is v1 (only conforming images to LPI orientation, no further preprocessing). Please note that by changing the version to v1 the segmenation quality might be slightly altered. Note that in each case nnU-Net applies further preprocessing steps before the CNN model is invoked.
 
