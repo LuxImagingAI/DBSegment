@@ -390,6 +390,7 @@ def preprocessing(parser):
         input_img = os.path.join(input_folder, file_name)
         filename, file_extension = os.path.splitext(file_name)
         filename1, file_extension1 = os.path.splitext(filename)
+        # nnU-net expects the input images to be in the format of 'id_XXXX.nii.gz' where XXXX indicates the modality
         output_img = os.path.join(path, filename1 + '_0000'+ file_extension1 + file_extension)
         if not overwrite_existing:
            if not os.path.isfile(output_img):
@@ -415,8 +416,9 @@ def preprocessing(parser):
         file_path , file_name = os.path.split(file)
         input_img = os.path.join(input_folder, file_name)
         filename, file_extension = os.path.splitext(file_name)
+        # nnU-net expects the input images to be in the format of 'id_XXXX.nii.gz' where XXXX indicates the modality
         output_img = os.path.join(path, filename + '_0000'+ file_extension + '.gz')
-        if not overwrite_existing:        
+        if not overwrite_existing:
              if not os.path.isfile(output_img):        
                 print('Pre-processing: ', file_name)
                 correct_header(input_img, output_img)
