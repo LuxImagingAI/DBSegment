@@ -1,13 +1,16 @@
 # DBSegment <h1>
 
-  ## Command line tool 
-  This tool generates 30 deep brain structures segmentation, as well as a brain mask from T1-Weighted MRI. The whole procedure should take ~1 min for one case.
-  For a defintion of the resulting labels refer to the paper or the provided ITK labels file `labels.txt`.
+## Command line tool 
+This tool generates 30 deep brain structures segmentation, as well as a brain mask from T1-Weighted MRI. The whole procedure should take ~1 min for one case.
+For a defintion of the resulting labels refer to the paper or the provided ITK labels file `labels.txt`.
   
- The tool is available as a pip package. **The package works on both GPU and CPU.**
+The tool is available as a pip package. **The package works on both GPU and CPU.**
   
- We highly recommend installing the package inside a virtual environment. For some instruction on virtual envrionment and pip package installation, please refer to: https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/.  
-  We also strongly recommend to work with two dedicated and separate _input_ and _output_ folders inside the project folder. This avoids any possible naming conflict.
+We highly **recommend installing the package inside a virtual environment**. For some instruction on virtual envrionment and pip package installation, please refer to: https://packaging.python.org/guides/installing-using-pip-and-virtual-environments/.  
+We also strongly recommend to work with two dedicated and separate _input_ and _output_ folders inside the project folder. This avoids any possible naming conflict.
+  
+We provide different ways of installation, at the moment: a pip package or docker image. Alternativly you could always choose to "manually" install by cloning the git repository and managing all dependencies by yourself. The key dependency is the [nnU-Net Framework](https://github.com/MIC-DKFZ/nnUNet) (and the super-depencies arising from that) as we use an nnU-Net segmentation model.
+To use DBSegment in high performance computing environments (HPC), we recommend the pip package, as docker is not well suited for conventional multi-user envioronments.
 
   **Installation using Docker**
   
@@ -15,11 +18,9 @@
  2. Pull the DBSegment image `docker pull mehrib/dbsegment:v4`. You Need to do this just the first time. 
  3. Run the image `docker run -v "/input_folder/:/input/" -v "/output_folder/output/:/output/" mehrib/dbsegment:v4`
   
- Comment for M1 users: the third step adapted for M1 users is:
+ Comment for Apple M1 users: the third step adapted for M1 users is:
  3. Run the image `docker run --platform Linux/amd64 -v "/input_folder/:/input/" -v "/output_folder/:/output/" mehrib/dbsegment:v4`
- 
- **Errors related to recognizing the nifti image in the folder might remain for M1 users.**
- 
+  
 **Installation using pip**
   
   `pip install DBSegment`
@@ -47,9 +48,9 @@ optional: **-mp** path to store the model that will be downloaded automatically.
 
   `-mp /Users/mehri.baniasadi/Documents/models`
 
-optional: **-f** folds (networks) used for segmentation inferrence. The available folds are *0, 1, 2, 3, 4, 5, 6*. The default folds are *4* and *6*. We recommend to keep the default settings, and do not define this parameter. Using more folds will increase the needed computation time.
+optional: **-f** folds (networks) used for segmentation inferrence. The available folds are *0, 1, 2, 3, 4, 5, 6*. The default folds are *4* and *6*.   Using more folds will increase the needed computation time but potentially improve segmentation quality.
   
- optional: **-v**  is the the version of the preprocessing you would like to aply before segmenation. The default is v3 (LPI oritnation, 1mm voxel spacing, 256 Dimension). The alternative option is v1 (LPI orientaiton). Please note that by chaning the version to v1 the segmenation quality will reduce by 1-2%.
+ optional: **-v**  is the the version of the preprocessing applied before segmenation. The default is v3 (LPI orienatation, 1mm voxel spacing, 256 Dimension). The alternative option avialable is v1 (only conforming images to LPI orientation, no further preprocessing). Please note that by changing the version to v1 the segmenation quality might be slightly altered. Note that in each case nnU-Net applies further preprocessing steps before the CNN model is invoked.
 
   `-v v3`
   
