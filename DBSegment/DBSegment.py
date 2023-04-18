@@ -13,6 +13,7 @@ import torch
 import SimpleITK as sitk
 import warnings
 import platform
+import multiprocessing as mp
 
 
 def arguments():       
@@ -601,6 +602,14 @@ def main():
     """
         add comments
     """
+
+    # setting the multiprocessing method
+    # avoids error with apple silicon
+    if platform.system() == 'Windows':
+        mp.set_start_method("spawn") 
+    else:
+        mp.set_start_method("fork")
+
     warnings.filterwarnings("ignore", message=r'(.*)(CUDA is not available)(.*)' )
     main_preprocess()
     main_infer()
@@ -609,5 +618,6 @@ def main():
     main_brainmask()
 
 if __name__ == "__main__":
+    
     main()
 
