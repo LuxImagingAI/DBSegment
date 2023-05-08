@@ -13,6 +13,7 @@ import torch
 import SimpleITK as sitk
 import warnings
 import platform
+import multiprocessing as mp
 
 
 def arguments():       
@@ -390,7 +391,8 @@ def preprocessing(parser):
         input_img = os.path.join(input_folder, file_name)
         filename, file_extension = os.path.splitext(file_name)
         filename1, file_extension1 = os.path.splitext(filename)
-        output_img = os.path.join(path, filename1 + '_out'+ file_extension1 + file_extension)
+        # nnU-net expects the input images to be in the format of 'id_XXXX.nii.gz' where XXXX indicates the modality
+        output_img = os.path.join(path, filename1 + '_0000'+ file_extension1 + file_extension)
         if not overwrite_existing:
            if not os.path.isfile(output_img):
                print('Pre-processing: ', file_name)
@@ -415,8 +417,9 @@ def preprocessing(parser):
         file_path , file_name = os.path.split(file)
         input_img = os.path.join(input_folder, file_name)
         filename, file_extension = os.path.splitext(file_name)
-        output_img = os.path.join(path, filename + '_out'+ file_extension + '.gz')
-        if not overwrite_existing:        
+        # nnU-net expects the input images to be in the format of 'id_XXXX.nii.gz' where XXXX indicates the modality
+        output_img = os.path.join(path, filename + '_0000'+ file_extension + '.gz')
+        if not overwrite_existing:
              if not os.path.isfile(output_img):        
                 print('Pre-processing: ', file_name)
                 correct_header(input_img, output_img)
@@ -599,6 +602,14 @@ def main():
     """
         add comments
     """
+
+    # setting the multiprocessing method
+    # avoids error with apple silicon
+    if platform.system() == 'Windows':
+        mp.set_start_method("spawn") 
+    else:
+        mp.set_start_method("fork")
+
     warnings.filterwarnings("ignore", message=r'(.*)(CUDA is not available)(.*)' )
     main_preprocess()
     main_infer()
@@ -607,5 +618,6 @@ def main():
     main_brainmask()
 
 if __name__ == "__main__":
+    
     main()
 
