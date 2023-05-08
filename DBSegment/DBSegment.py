@@ -564,7 +564,8 @@ def main_to_native():
             print(file)
             file_path , file_name = os.path.split(file)
             filename, file_extension = os.path.splitext(file_name)
-            mr_prep_str = os.path.join(input_mr_preprocessed, filename + '_out' + file_extension + '.gz')
+            # nnU-net expects the input images to be in the format of 'id_XXXX.nii.gz' where XXXX indicates the modality
+            mr_prep_str = os.path.join(input_mr_preprocessed, filename + '_0000' + file_extension + '.gz')
             seg_prep_str = os.path.join(output_seg_preprocessed, filename + file_extension + '.gz')
             seg_native_str = os.path.join(output_seg_native, filename + file_extension + '.gz')
             #brainmask_prep_str = os.path.join(output_seg_preprocessed, filename + '_brainmask' + file_extension + '.gz')
@@ -582,7 +583,8 @@ def main_to_native():
             file_path , file_name = os.path.split(file)
             filename, file_extension = os.path.splitext(file_name)
             filename1, file_extension1 = os.path.splitext(filename)
-            mr_prep_str = os.path.join(input_mr_preprocessed,  filename1 + '_out' + file_extension1 + file_extension)
+            # nnU-net expects the input images to be in the format of 'id_XXXX.nii.gz' where XXXX indicates the modality
+            mr_prep_str = os.path.join(input_mr_preprocessed,  filename1 + '_0000' + file_extension1 + file_extension)
             seg_prep_str = os.path.join(output_seg_preprocessed, filename1 + file_extension1 + file_extension)
             seg_native_str = os.path.join(output_seg_native, filename1 + file_extension1 + file_extension)
             #brainmask_prep_str = os.path.join(output_seg_preprocessed, filename1 + '_brainmask' + file_extension1 + file_extension)
