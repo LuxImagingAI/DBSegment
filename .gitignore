@@ -1,0 +1,6 @@
+build/
+models/
+input/
+output/
+
+DBSegment/.DS_Store

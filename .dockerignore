@@ -1,0 +1,7 @@
+Dockerfile
+build
+.github
+CHANGELOG.md
+README.md
+DBSegment.egg-info
+build
