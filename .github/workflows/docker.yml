@@ -5,8 +5,8 @@ on:
     branches:
       - "main"
       - "development"
-    tags:
-      - '*'
+  release:
+    types: [published]
 
 
 jobs:
@@ -27,7 +27,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5
         with:
-          images: imagingai/$REPOSITORY_NAME
+          images: imagingai/${{ vars.REPOSITORY_NAME }}
           tags: |
             type=ref,event=branch
             type=ref,event=pr
