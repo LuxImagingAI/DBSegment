@@ -25,5 +25,5 @@ COPY .. /DBSegment
 RUN cd /DBSegment && conda run -n dbsegment pip install . --no-cache-dir &&\
     conda run -n dbsegment pip cache purge
 
-ENTRYPOINT [ "bin/bash", "--login", "-c", "/condaforge/bin/conda run -n dbsegment DBSegment \"$@\" -i /input -o /output -mp /models" ]
+ENTRYPOINT ["bin/bash", "--login", "-c", "conda run --no-capture-output -n dbsegment DBSegment \"$@\" -i /input -o /output -mp /models" ]
 
