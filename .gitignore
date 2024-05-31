@@ -4,3 +4,4 @@ input/
 output/
 
 DBSegment/.DS_Store
+Dockerfile copy

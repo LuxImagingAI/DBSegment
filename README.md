@@ -15,8 +15,9 @@ To use DBSegment in high performance computing environments (HPC), we recommend 
   **Installation using Docker**
   
  1. Install Docker.
- 2. Pull the DBSegment image `docker pull mehrib/dbsegment:v4`. You Need to do this just the first time. 
- 3. Run the image `docker run -v "/input_folder/:/input/" -v "/output_folder/output/:/output/" mehrib/dbsegment:v4`
+ 2. Run the image `docker run -v "input_folder/:/input" -v "output_folder/:/output" -v "model_folder:/models" imagingai/dbsegment:latest`
+
+For apple silicon based architectures it might be required to specify the image platform: `docker run --platform=linux/amd64 -v "input_folder/:/input" -v "output_folder/:/output" -v "model_folder:/models" imagingai/dbsegment:latest`
   
   
 **Installation using pip**

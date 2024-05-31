@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 debian:trixie-20240513
+FROM --platform=linux/amd64 debian:trixie-slim
 
 SHELL ["/bin/bash", "--login", "-c"]
 
@@ -15,13 +15,15 @@ RUN curl -L -O "https://github.com/conda-forge/miniforge/releases/latest/downloa
 
 # create environment
 COPY docker_environment.yaml /DBSegment/docker_environment.yaml
-RUN conda env create -f /DBSegment/docker_environment.yaml --quiet
+RUN conda env create -f /DBSegment/docker_environment.yaml --quiet &&\
+    conda clean -afy
 
 # useful for debugging, avoids reinstallation of all dependencies
 # RUN conda run -n dbsegment pip install nibabel==5.2.1 scipy==1.13.1 torch==2.3.0 requests==2.32.2  antspyx==0.4.2 nnunet==1.7.1
 
 COPY .. /DBSegment
-RUN cd /DBSegment && conda run -n dbsegment pip install .
+RUN cd /DBSegment && conda run -n dbsegment pip install . --no-cache-dir &&\
+    conda run -n dbsegment pip cache purge
 
-ENTRYPOINT [ "bin/bash", "--login", "-c", "/condaforge/bin/conda run --no-capture-output -n dbsegment DBSegment \"$@\" -i /input -o /output -mp /models" ]
+ENTRYPOINT [ "bin/bash", "--login", "-c", "/condaforge/bin/conda run -n dbsegment DBSegment \"$@\" -i /input -o /output -mp /models" ]
 
