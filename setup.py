@@ -2,8 +2,12 @@ from setuptools import setup, find_packages
 import codecs
 import os
 
-VERSION = '0.2.0'
+VERSION = '0.2.2'
 DESCRIPTION = 'A deep learning based method to segment deep brain structures from T1w MRI'
+
+with open('README.md') as f:
+    readme = f.read()
+
 # Setting up
 setup(
       name="DBSegment",
@@ -11,6 +15,8 @@ setup(
       author="Mehri",
       author_email="mehri.baniasadi92@gmail.com",
       description=DESCRIPTION,
+      long_description_content_type="text/markdown",
+      long_description=readme,
       packages=find_packages(),
       readme="README.md",
       install_requires=[

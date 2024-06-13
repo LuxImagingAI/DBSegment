@@ -5,3 +5,6 @@ output/
 
 DBSegment/.DS_Store
 Dockerfile copy
+DBSegment.egg-info
+dist/
+
